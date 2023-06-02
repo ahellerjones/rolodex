@@ -50,15 +50,7 @@ endpoints
       }
     ]
   }
-  UPDATE 
-  req. 
-  {
-    id: 123 
-  }
-  resp. 
-  200 OK 
-  404 User Not Found 
-  DELETE # note, any number of fields can be provided 
+  UPDATE # note, any number of fields can be provided 
   req. 
   {
       id: { 
@@ -66,6 +58,14 @@ endpoints
         "address": "yyy"
         "phoneNumber":"zzz"
       }, 
+  }
+  resp. 
+  200 OK 
+  404 User Not Found 
+  DELETE 
+  req. 
+  {
+    id: 123 
   }
   resp. 
   200 OK 
