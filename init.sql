@@ -9,10 +9,9 @@ CREATE TABLE users(
 -- Mod Contacts table
 
 CREATE TABLE contacts(
-    contactID int primary key,
+    contactID int AUTO_INCREMENT primary key,
     userID int, 
-    firstname varchar(256),
-    lastname varchar(256),
+    name varchar(256),
     address varchar(256),
     phonenumber varchar(64), 
     email varchar(256), 
@@ -31,7 +30,16 @@ INSERT INTO users VALUES(
 SELECT userID FROM users
 WHERE {login_data} = login_name AND {password} = password
 
--- create new contact
+-- create new contact - default autoincrements, userID is from frontend, pass null for values not used
 INSERT INTO contacts VALUES(
-    
+    DEFAULT, {userID}, {name}, {address}, {phonenumber}, {email}, {birthday}
 )
+
+-- update contact - pass in all old data, but replace new data 
+UPDATE contacts
+SET name = {new}, address = {new}, phonenumber = {new}, email = {new}, birthday = {new}
+WHERE contactID = {contactID}
+
+-- get all contacts
+SELECT * FROM contacts
+WHERE userID = {userID}
