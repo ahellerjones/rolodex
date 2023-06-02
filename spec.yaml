@@ -1,0 +1,73 @@
+endpoints
+- /login
+  POST
+    req. 
+    { 
+      "username":"xxx"
+      "password":"yyy"
+      "loginOrSetup":true
+    }
+    resp.   
+    200 OK 
+    409 User already exits  
+    
+-/contacts
+  POST
+  req.
+  {
+    "name":"xxx"
+    "address": "yyy"
+    "phoneNumber":"zzz"
+    "email": "aaa"
+    "birthday":"MM-DD-YYYY"
+  }
+  resp.
+  200 OK 
+  409 contact Exists
+  note the key is an integer 
+  {
+    "key":1234
+  }
+  GET
+  req.
+  no body
+  resp.
+  {
+    [ 
+      id: { 
+        "name":"xxx"
+        "address": "yyy"
+        "phoneNumber":"zzz"
+        "email": "aaa"
+        "birthday":"MM-DD-YYYY"
+      }, 
+      id2: {
+        "name":"xxx"
+        "address": "yyy"
+        "phoneNumber":"zzz"
+        "email": "aaa"
+        "birthday":"MM-DD-YYYY"
+      }
+    ]
+  }
+  UPDATE 
+  req. 
+  {
+    id: 123 
+  }
+  resp. 
+  200 OK 
+  404 User Not Found 
+  DELETE # note, any number of fields can be provided 
+  req. 
+  {
+      id: { 
+        "name":"xxx"
+        "address": "yyy"
+        "phoneNumber":"zzz"
+      }, 
+  }
+  resp. 
+  200 OK 
+  404 User Not Found 
+
