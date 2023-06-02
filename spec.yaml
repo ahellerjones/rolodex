@@ -5,7 +5,7 @@ endpoints
     { 
       "username":"xxx"
       "password":"yyy"
-      "loginOrSetup":true
+      "loginOrSignup":true
     }
     resp.   
     200 OK 

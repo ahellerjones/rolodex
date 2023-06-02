@@ -1,1 +1,3 @@
+POST /login loginOrSetup = false # Signup
 - check if username and password exist
+- check if username exists
