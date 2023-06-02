@@ -19,8 +19,8 @@ endpoints
   POST
   req.
   {
-    "name":"xxx"
-    "address": "yyy"
+    "name":"xxx" 
+    "address": "yyy" ##optional
     "phoneNumber":"zzz"
     "email": "aaa"
     "birthday":"MM-DD-YYYY"
