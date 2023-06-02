@@ -45,7 +45,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		// If we're just trying to login
-		if loginInfo.loginOrSetup { 
+		if loginInfo.loginOrSignup { 
 			err = checkUsernamePassword(loginInfo) // TODO 
 			if err != nil {
 				http.Error(w, err.Error(), 500)
@@ -72,51 +72,58 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func checkUsernamePassword(loginInfo LoginInfo)(err error) { 
+	return nil
+}
+
+func checkIfUserExists(loginInfo LoginInfo)(err error) { 
+	return nil
+}
+
+func createUser(loginInfo LoginInfo)(err error) { 
+	return nil
+}
+
 func contactsHandler(w http.ResponseWriter, r *http.Request) {
-switch r.Method {
-	case http.MethodGet:
-		getContacts	
-
-
-
-
-	case http.MethodPost:
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		http.Error(w, "Failed to read request body", http.StatusInternalServerError)
-		return
-	}
-	defer r.Body.Close()
-	var loginInfo LoginInfo
-	err = json.Unmarshal(body, &loginInfo)
-	// This should catch all shitty unmarshalling
-	if err != nil {
-		http.Error(w, err.Error(), 410)
-		return
-	}
-	// If we're just trying to login
-	if loginInfo.loginOrSetup { 
-		err = checkUsernamePassword(loginInfo) // TODO 
-		if err != nil {
-			http.Error(w, err.Error(), 500)
-			return
-		}
-		w.WriteHeader(http.StatusOK) // 200
-		fmt.Fprint(w, "{%s}", loginInfo.user)
-	} else { 
-		// Else we're trying to setup an account 
-		err = checkIfUserExists(loginInfo) // TODO 
-		if err != nil { 
-			http.Error(w, err.Error(), 500)
-			return
-		} 
-		err = createUser(loginInfo)
-		if err != nil { 
-			http.Error(w, err.Error(), 500)
-			return
-		} 
-	}
-	default:
-		w.WriteHeader(http.StatusConflict) // 410
-		fmt.Fprint(w, "Illegal request to /login")
+// switch r.Method {
+// 	case http.MethodGet:
+// 	case http.MethodPost:
+// 	body, err := ioutil.ReadAll(r.Body)
+// 	if err != nil {
+// 		http.Error(w, "Failed to read request body", http.StatusInternalServerError)
+// 		return
+// 	}
+// 	defer r.Body.Close()
+// 	var loginInfo LoginInfo
+// 	err = json.Unmarshal(body, &loginInfo)
+// 	// This should catch all shitty unmarshalling
+// 	if err != nil {
+// 		http.Error(w, err.Error(), 410)
+// 		return
+// 	}
+// 	// If we're just trying to login
+// 	if loginInfo.loginOrSetup { 
+// 		err = checkUsernamePassword(loginInfo) // TODO 
+// 		if err != nil {
+// 			http.Error(w, err.Error(), 500)
+// 			return
+// 		}
+// 		w.WriteHeader(http.StatusOK) // 200
+// 		fmt.Fprint(w, "{%s}", loginInfo.user)
+// 	} else { 
+// 		// Else we're trying to setup an account 
+// 		err = checkIfUserExists(loginInfo) // TODO 
+// 		if err != nil { 
+// 			http.Error(w, err.Error(), 500)
+// 			return
+// 		} 
+// 		err = createUser(loginInfo)
+// 		if err != nil { 
+// 			http.Error(w, err.Error(), 500)
+// 			return
+// 		} 
+// 	}
+// 	default:
+// 		w.WriteHeader(http.StatusConflict) // 410
+// 		fmt.Fprint(w, "Illegal request to /login")
 }
