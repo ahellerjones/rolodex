@@ -20,6 +20,10 @@ CREATE TABLE contacts(
 )
 
 -- update users table with SIGN-UP
+-- check if user exists 
+SELECT userID FROM users
+WHERE userID = {userID}
+
 -- should return success
 INSERT INTO users VALUES(
     DEFAULT, login_name, password
