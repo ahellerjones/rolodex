@@ -9,7 +9,11 @@ endpoints
     }
     resp.   
     200 OK 
+    {
+      "username":"xxx"
+    }
     409 User already exits  
+    410 bad request
     
 -/contacts
   POST
