@@ -39,6 +39,8 @@ DELETE FROM users
 WHERE login_name = {arg_login_name} AND password = {arg_password}
 
 
+
+
 -- create new contact - default autoincrements, userID is from frontend, pass null for values not used
 INSERT INTO contacts VALUES(
     DEFAULT, {arg_userID}, {arg_name}, {arg_address}, {arg_phone_number}, {arg_email}, {arg_birthday}
