@@ -99,7 +99,7 @@ func main() {
 	}
 
 	func (handler, *SQLiteHandler) insertUser(logininfo LoginInfo) error{
-		insert, err := handler.db.Prepare("
+		insert, err := handler.db.Prepare(f"
 		INSERT INTO users VALUES(
 			DEFAULT, {logininfo.user}, {logininfo.password}
 		)")
@@ -119,7 +119,7 @@ func main() {
 	}
 
 	func (handler, *SQLiteHandler) deleteUser(logininfo LoginInfo) error{
-		delete, err := handler.db.Prepare(F"
+		delete, err := handler.db.Prepare(f"
 		DELETE FROM users
 		WHERE userID = {logininfo.userID}
 		)")
@@ -135,6 +135,54 @@ func main() {
 			return err
 		}
 		return id
+	}
+// 
+//
+//
+//
+//
+	func (handler, *SQLiteHandler) insertContact(userID int, contact Contact) error{
+		insert, err := handler.db.Prepare(f"
+		INSERT INTO contacts VALUES(
+			DEFAULT, {userID}, {contact.name}, {contact.address}, {contact.phoneNumber}, 
+			{contact.email}, {contact.birthday}
+		)
+		")
+		if err != nil {
+			return err
+		}
+		_, err = update.Exec()
+		if err != nil {
+			return err
+		}
+		// fetch ID of last record inserted
+		// make sure this is the contact ID and not the user ID
+		id, err = _.LastInsertID()
+		if err != nil {
+			return err
+		}
+		return id
+	}
+
+	func (handler, *SQLiteHandler) getContacts(userID int) error{
+		// checks username and password for existence
+		contactlist, err := handler.db.Query(f"
+		SELECT * FROM contacts
+		WHERE userID = {userID}
+		")
+		defer contactlist.Close()
+
+		var userID int
+		for check.Next() {
+			err := rows.Scan(&userID)
+			if err != nil {
+				return err
+			}
+			return userID 
+		}
+		// if no user and password match, user does not exist
+		return nil
+		return 
 	}
 
 
