@@ -46,7 +46,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		// If we're just trying to login
 		if loginInfo.loginOrSignup { 
-			err = checkUsernamePassword(loginInfo) // TODO 
+			userId, err = checkUsernamePassword(loginInfo) // TODO 
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 				return

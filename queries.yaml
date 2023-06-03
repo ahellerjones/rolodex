@@ -1,4 +1,8 @@
-POST /login loginOrSetup = false # Signup
 - check if username and password exist and match 
+  - pass back userId
 - check if username exists
-- create user, give back the userId
+  - pass back userId
+- create user with password,  
+  - pass back userId 
+  - pass back error if username already take
+- delete user
