@@ -164,26 +164,47 @@ func main() {
 		return id
 	}
 
-	func (handler, *SQLiteHandler) getContacts(userID int) error{
-		// checks username and password for existence
+	##func (handler, *SQLiteHandler) getContacts(userID int) error{
+		
 		contactlist, err := handler.db.Query(f"
 		SELECT * FROM contacts
 		WHERE userID = {userID}
+		ORDER BY name desc
 		")
 		defer contactlist.Close()
 
-		var userID int
-		for check.Next() {
-			err := rows.Scan(&userID)
+		var contactId int 
+		var name string 
+		var address string 
+		var phoneNumber string 
+		var email string 
+		var birthday string
+
+		// iterate through each and create a contact
+		for contactList.Next() {
+			err := rows.Scan(&contactID, &name, &address, &phoneNumber, &email, &birthday)
 			if err != nil {
 				return err
 			}
-			return userID 
+			return userID
 		}
-		// if no user and password match, user does not exist
-		return nil
-		return 
+		return nil 
 	}
+
+	func (handler, *SQLiteHandler) deleteContext(userID int, contact Contact) error{
+		delete, err := handler.db.Prepare(f"
+		DELETE FROM contacts 
+		WHERE contactID = {contact.key}
+		")
+		if err != nil {
+			return err
+		}
+		_, err = update.Exec()
+		if err != nil {
+			return err
+		}
+
+		return err
 
 
 

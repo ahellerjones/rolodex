@@ -58,7 +58,7 @@ type Contact struct {
 
 - updateContact 
   params: 
-    - ContactInfo struct, # Note contact info may have nil fields if not updated
+    - Contact struct, # Note contact info may have nil fields if not updated
     - userId -- int for the user
   returns:
     err 
