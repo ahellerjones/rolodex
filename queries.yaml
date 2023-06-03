@@ -16,13 +16,7 @@ type LoginInfo struct {
   returns: 
   - pass back userId, nil error
   - nil username, err if does not exist
-<<<<<<< HEAD
 - create user 
-=======
-
-  
-- create user integer with password,  
->>>>>>> 04cd4f797fa52fb2ee61fb02acf6b4bc115138e4
   params: 
     - LoginInfo struct
   returns: 
@@ -55,3 +49,18 @@ type Contact struct {
     params: 
     returns:
     returns an array with the contact structs, err if problems. 
+
+- updateContact 
+  params: 
+    - ContactInfo struct, # Note contact info may have nil fields if not updated
+    - ContactKey struct 
+  returns:
+    err 
+  
+-deleteContact
+  params: 
+      -ContactKey struct
+  returns: 
+    err
+
+
