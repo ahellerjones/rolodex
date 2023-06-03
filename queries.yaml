@@ -1,3 +1,4 @@
 POST /login loginOrSetup = false # Signup
-- check if username and password exist
+- check if username and password exist and match 
 - check if username exists
+- create user, give back the userId
