@@ -19,6 +19,7 @@ endpoints
   POST
   req.
   {
+    userId
     "name":"xxx" 
     "address": "yyy" ##optional
     "phoneNumber":"zzz"
