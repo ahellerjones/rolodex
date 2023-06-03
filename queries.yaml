@@ -30,36 +30,41 @@ type LoginInfo struct {
 
 
 type Contact struct { 
+	key int `json:key`
   name string `json:name`
   address string `json:address`
   phoneNumber string `json:phoneNumber`
   email string `json:email`
   birthday string `json:birthday`
 }
+
+
 - postContact
   params:
     - Contact struct
-  all of the fields are optional (going to want to check to make sure theyre not nil?)
+    - userId -- int for the user
+  all of the fields are optional except key (going to want to check to make sure theyre not nil?)
   returns: 
-  - pass back Id, nil err
-  - nil Id, err if contact already exists
+  - pass back contact, nil err
 
 - getContacts
     # Get all contacts 
     params: 
+    - userId -- int for the user
     returns:
-    returns an array with the contact structs, err if problems. 
+    returns an array with the contact structs, err if problems, 
 
 - updateContact 
   params: 
     - ContactInfo struct, # Note contact info may have nil fields if not updated
-    - ContactKey struct 
+    - userId -- int for the user
   returns:
     err 
   
 -deleteContact
   params: 
-      -ContactKey struct
+    - Contact struct
+    - userId -- int for the user
   returns: 
     err
 
