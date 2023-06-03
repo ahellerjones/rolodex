@@ -99,7 +99,7 @@ func main() {
 	}
 
 	func (handler, *SQLiteHandler) insertUser(logininfo LoginInfo) error{
-		insert, err := handler.db.Prepare("
+		insert, err := handler.db.Prepare(f"
 		INSERT INTO users VALUES(
 			DEFAULT, {logininfo.user}, {logininfo.password}
 		)")
@@ -119,7 +119,7 @@ func main() {
 	}
 
 	func (handler, *SQLiteHandler) deleteUser(logininfo LoginInfo) error{
-		delete, err := handler.db.Prepare(F"
+		delete, err := handler.db.Prepare(f"
 		DELETE FROM users
 		WHERE userID = {logininfo.userID}
 		)")
@@ -130,6 +130,55 @@ func main() {
 		if err != nil {
 			return err
 		}
+		id, err = _.LastInsertID()
+		if err != nil {
+			return err
+		}
+		return id
+	}
+// 
+//
+//
+//
+//
+	func (handler, *SQLiteHandler) insertContact(contact Contact) error{
+		insert, err := handler.db.Prepare(f"
+		INSERT INTO contacts VALUES(
+			DEFAULT, {contact}, {contact.name}, {contact.address}, {contact.phoneNumber}, 
+			{contact.email}, {contact.birthday}
+		)
+		")
+		if err != nil {
+			return err
+		}
+		_, err = update.Exec()
+		if err != nil {
+			return err
+		}
+		// fetch ID of last record inserted
+		// make sure this is the contact ID and not the user ID
+		id, err = _.LastInsertID()
+		if err != nil {
+			return err
+		}
+		return id
+	}
+	func (handler, *SQLiteHandler) insertContact(contact Contact) error{
+		insert, err := handler.db.Prepare(f"
+		INSERT INTO contacts VALUES(
+			DEFAULT, {contact}, {contact.name}, {contact.address}, {contact.phoneNumber}, 
+			{contact.email}, {contact.birthday}
+		)
+		")
+		if err != nil {
+			return err
+		}
+		_, err = update.Exec()
+		if err != nil {
+			return err
+		}
+		// fetch ID of last record inserted
+		// make sure this is the contact ID and not the user ID
 		id, err = _.LastInsertID()
 		if err != nil {
 			return err
