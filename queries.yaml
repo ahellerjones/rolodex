@@ -16,7 +16,9 @@ type LoginInfo struct {
   returns: 
   - pass back userId, nil error
   - nil username, err if does not exist
-- create user 
+
+  
+- create user integer with password,  
   params: 
     - LoginInfo struct
   returns: 
