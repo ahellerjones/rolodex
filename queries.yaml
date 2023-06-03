@@ -32,19 +32,18 @@ type LoginInfo struct {
 
 
 type Contact struct { 
+	userId UserId `json:userId`
 	key int `json:key`
-  name string `json:name`
-  address string `json:address`
-  phoneNumber string `json:phoneNumber`
-  email string `json:email`
-  birthday string `json:birthday`
+	name string `json:name`
+	address string `json:address`
+	phoneNumber string `json:phoneNumber`
+	email string `json:email`
+	birthday string `json:birthday`
 }
-
-
+Since the userId is a field in the contact struct, then we dont pass the userId
 - postContact
   params:
     - Contact struct
-    - userId -- int for the user
   all of the fields are optional except key (going to want to check to make sure theyre not nil?)
   returns: 
   - pass back contact, nil err
@@ -58,15 +57,14 @@ type Contact struct {
 
 - updateContact 
   params: 
-    - Contact struct, # Note contact info may have nil fields if not updated
+    - ContactInfo struct, # Note contact info may have nil fields if not updated
     - userId -- int for the user
   returns:
     err 
   
 -deleteContact
   params: 
-    - Contact struct
-    - userId -- int for the user
+    - Contact struct 
   returns: 
     err
 

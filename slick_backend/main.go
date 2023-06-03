@@ -108,6 +108,7 @@ func createUser(loginInfo LoginInfo)(err error) {
 
 
 type Contact struct { 
+	userId UserId `json:userId`
 	key int `json:key`
 	name string `json:name`
 	address string `json:address`
@@ -132,7 +133,7 @@ switch r.Method {
 			http.Error(w, err.Error(), 410)
 			return
 		}
-		key, err := storeContact(contact)
+		contact, err := storeContact(contact)
 		if err != nil { 
 			http.Error(w, err.Error(), 410)
 			return

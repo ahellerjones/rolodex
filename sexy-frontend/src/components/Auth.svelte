@@ -1,14 +1,14 @@
 <script>
-  import { POST_LOGIN } from "./constants";
+  import { POST_LOGIN } from "../lib/constants";
+  import { auth } from "../lib/stores";
 
-  let isLoading = false;
-
+  let loading = false;
   let username;
   let password;
 
   const onClick = (loginOrSetup) => {
     if (username && password) {
-      isLoading = true;
+      loading = true;
 
       const body = {
         username,
@@ -22,35 +22,34 @@
       })
         .then((res) => {
           console.log(res);
-          isLoading = false;
+          loading = false;
         })
         .catch((err) => {
           console.log(err);
-          isLoading = false;
+          loading = false;
+          auth.set(true);
         });
     }
   };
 </script>
 
 <main class=" h-screen w-screen flex justify-center items-center">
-  {#if isLoading}
+  {#if loading}
     <div>loading</div>
   {:else}
-    <div
-      class=" w-96 xl:w-1/3 p-4 rounded-sm border-2 border-slate-400 space-y-4 flex flex-col"
-    >
+    <div class=" w-96 xl:w-1/3 p-4 rounded-md border-2 space-y-4 flex flex-col">
       <h1 class=" font-bold text-xl">Authenticate</h1>
       <input
         type="text"
         bind:value={username}
         placeholder="username"
-        class=" p-2 border border-slate-300"
+        class=" p-2 border rounded"
       />
       <input
         type="text"
         bind:value={password}
         placeholder="password"
-        class=" p-2 border border-slate-300"
+        class=" p-2 border rounded"
       />
       <div class=" flex space-x-4">
         <button
