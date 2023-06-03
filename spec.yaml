@@ -5,12 +5,12 @@ endpoints
     { 
       "username":"xxx"
       "password":"yyy"
-      "loginOrSetup":true
+      "loginOrSignup":true
     }
     resp.   
     200 OK 
     {
-      "username":"xxx"
+      "userId":123
     }
     409 User already exits  
     410 bad request
