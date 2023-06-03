@@ -3,6 +3,7 @@ type LoginInfo struct {
 	pass string `json:password`
 	loginOrSignup bool `json:loginOrSignup`
 }
+
 - check if username and password exist 
   params: 
     - LoginInfo struct
@@ -15,6 +16,8 @@ type LoginInfo struct {
   returns: 
   - pass back userId, nil error
   - nil username, err if does not exist
+
+  
 - create user integer with password,  
   params: 
     - LoginInfo struct
