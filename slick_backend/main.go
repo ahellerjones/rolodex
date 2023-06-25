@@ -1,11 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"io/ioutil"
-	"encoding/json"
 )
 
 func main() {
@@ -22,103 +22,116 @@ func main() {
 func landingHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "../sexy_frontend/dist/index.html")
 }
-type LoginInfo struct { 
-	user string `json:username`
-	pass string `json:password`
-	loginOrSignup bool `json:loginOrSignup`
+
+type LoginInfo struct {
+	username      string `json:username`
+	pass          string `json:password`
+	loginOrSignup bool   `json:loginOrSignup`
 }
-type UserId struct { 
+type UserId struct {
 	id int `json:id`
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
-		case http.MethodPost:
-			body, err := ioutil.ReadAll(r.Body)
+	case http.MethodPost:
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Failed to read request body", http.StatusInternalServerError)
+			return
+		}
+		defer r.Body.Close()
+		var loginInfo LoginInfo
+		err = json.Unmarshal(body, &loginInfo)
+		// This should catch all shitty unmarshalling
+		if err != nil {
+			http.Error(w, err.Error(), 410)
+			return
+		}
+		// If we're just trying to login
+		if loginInfo.loginOrSignup {
+			userId, err := checkUsernamePassword(loginInfo) // TODO
 			if err != nil {
-				http.Error(w, "Failed to read request body", http.StatusInternalServerError)
+				http.Error(w, err.Error(), 500)
 				return
 			}
-			defer r.Body.Close()
-			var loginInfo LoginInfo
-			err = json.Unmarshal(body, &loginInfo)
-			// This should catch all shitty unmarshalling
+			w.WriteHeader(http.StatusOK) // 200
+			userIdResponse := UserId{
+				id: userId,
+			}
+			jsonData, err := json.Marshal(userIdResponse)
 			if err != nil {
-				http.Error(w, err.Error(), 410)
+				http.Error(w, "Failed to marshal JSON during login", http.StatusInternalServerError)
 				return
 			}
-			// If we're just trying to login
-			if loginInfo.loginOrSignup { 
-				userId, err := checkUsernamePassword(loginInfo) // TODO 
-				if err != nil {
-					http.Error(w, err.Error(), 500)
-					return
-				}
-				w.WriteHeader(http.StatusOK) // 200
-				userIdResponse := UserId { 
-					id: userId,
-				}
-				jsonData, err := json.Marshal(userIdResponse)
-				if err != nil {
-					http.Error(w, "Failed to marshal JSON during login", http.StatusInternalServerError)
-					return
-				}
-				w.Header().Set("Content-Type", "application/json")
-				w.Write(jsonData)
-			} else { 
-				// Else we're trying to setup an account 
-				err = checkIfUserExists(loginInfo) // TODO 
-				if err != nil { 
-					http.Error(w, err.Error(), 500)
-					return
-				} 
-				userId, err := createUser(loginInfo)
-				if err != nil { 
-					http.Error(w, err.Error(), 500)
-					return
-				} 
-				w.WriteHeader(http.StatusOK) // 200
-				userIdResponse := UserId { 
-					id: userId,
-				}
-				jsonData, err := json.Marshal(userIdResponse)
-				if err != nil {
-					http.Error(w, "Failed to marshal JSON during setup", http.StatusInternalServerError)
-					return
-				}
-				w.Header().Set("Content-Type", "application/json")
-				w.Write(jsonData)
+			w.Header().Set("Content-Type", "application/json")
+			w.Write(jsonData)
+		} else {
+			// Else we're trying to setup an account
+			err = checkIfUserExists(loginInfo) // TODO
+			if err != nil {
+				http.Error(w, err.Error(), 500)
+				return
 			}
-		default:
-			http.Error(w, "Illedate request to /login", http.StatusConflict)
+			userId, err := createUser(loginInfo)
+			if err != nil {
+				http.Error(w, err.Error(), 500)
+				return
+			}
+			w.WriteHeader(http.StatusOK) // 200
+			userIdResponse := UserId{
+				id: userId,
+			}
+			jsonData, err := json.Marshal(userIdResponse)
+			if err != nil {
+				http.Error(w, "Failed to marshal JSON during setup", http.StatusInternalServerError)
+				return
+			}
+			w.Header().Set("Content-Type", "application/json")
+			w.Write(jsonData)
+		}
+	default:
+		http.Error(w, "Illedate request to /login", http.StatusConflict)
 	}
 }
 
-func checkUsernamePassword(loginInfo LoginInfo)(err error) { 
+func checkUsernamePassword(loginInfo LoginInfo) (err error) {
 	return nil
 }
 
-func checkIfUserExists(loginInfo LoginInfo)(err error) { 
+func checkIfUserExists(loginInfo LoginInfo) (err error) {
 	return nil
 }
 
-func createUser(loginInfo LoginInfo)(err error) { 
+func createUser(loginInfo LoginInfo) (err error) {
 	return nil
 }
 
-
-type Contact struct { 
-	userId UserId `json:userId`
-	key int `json:key`
-	name string `json:name`
-	address string `json:address`
-	phoneNumber string `json:phoneNumber`
-	email string `json:email`
-	birthday string `json:birthday`
+// Contact struct contains userID to associate each contact entry with a particular user.
+// UserId should probably just be a string TODO:
+// I think key should probably be removed too.
+type Contact struct {
+	UserId      UserId `json:"UserId"` // Also need this!
+	Key         int    `json:"Key,omitempty"`
+	Name        string `json:"Name"` // Need this!
+	Address     string `json:"Address,omitempty"`
+	PhoneNumber string `json:"PhoneNumber,omitempty"`
+	Email       string `json:"Email,omitempty"`
+	Birthday    string `json:"Birthday,omitempty"`
 }
 
+type ContactKey struct {
+	Key int `json:"Key"`
+}
+
+// endpoint /contacts -- for reading a writing contact data.
+// POST -- user is storing a conact
+// GET -- gets all contacts
+// UPDATE -- updates one contact with id
+// DELETE -- deletes one contact
 func contactsHandler(w http.ResponseWriter, r *http.Request) {
-switch r.Method {
+	switch r.Method {
+	// POST
 	case http.MethodPost:
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
@@ -133,16 +146,16 @@ switch r.Method {
 			http.Error(w, err.Error(), 410)
 			return
 		}
-		contact, err := storeContact(contact)
-		if err != nil { 
+		key, err := storeContact(contact) // This gets a key for the given contact struct
+		if err != nil {
 			http.Error(w, err.Error(), 410)
 			return
 		}
 		w.WriteHeader(http.StatusOK) // 200
-		userIdResponse := ContactKey { 
-			key: key,
+		contactsKey := ContactKey{
+			Key: key,
 		}
-		jsonData, err := json.Marshal(userIdResponse)
+		jsonData, err := json.Marshal(contactsKey)
 		if err != nil {
 			http.Error(w, "Failed to marshal JSON during creating a contact", http.StatusInternalServerError)
 			return
@@ -150,10 +163,10 @@ switch r.Method {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(jsonData)
 
-
+	// GET
 	case http.MethodGet:
 		contacts, err := getContacts()
-		if err != nil { 
+		if err != nil {
 			http.Error(w, err.Error(), 410)
 			return
 		}
@@ -165,7 +178,8 @@ switch r.Method {
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(jsonData)
-	case http.MethodPut: 
+	// PUT
+	case http.MethodPut:
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			http.Error(w, "Failed to read request body put", http.StatusInternalServerError)
@@ -180,22 +194,22 @@ switch r.Method {
 			return
 		}
 		key, err := storeContact(contact)
-		if err != nil { 
+		if err != nil {
 			http.Error(w, err.Error(), 410)
 			return
 		}
 		w.WriteHeader(http.StatusOK) // 200
-		userIdResponse := ContactKey { 
-			key: key,
+		contactKey := ContactKey{
+			Key: key,
 		}
-		jsonData, err := json.Marshal(userIdResponse)
+		jsonData, err := json.Marshal(contactKey)
 		if err != nil {
 			http.Error(w, "Failed to marshal JSON during creating a contact", http.StatusInternalServerError)
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(jsonData)
-
+	case http.MethodDelete:
 
 	default:
 		w.WriteHeader(http.StatusConflict) // 410

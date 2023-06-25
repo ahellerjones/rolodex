@@ -20,7 +20,7 @@ endpoints
   req.
   {
     "userId": xxx
-    "key": xxx
+    "key": xxx # I think actually this is an optional field(as it'll be empty on a post), but the front end needs to know about it in order to perform updates. 
     "name":"xxx" 
     "address": "yyy" ##optional
     "phoneNumber":"zzz"
@@ -39,27 +39,26 @@ endpoints
   no body
   resp.
   {
-    [ 
-      id: { 
+      
+      "id": { 
         "name":"xxx"
         "address": "yyy"
         "phoneNumber":"zzz"
         "email": "aaa"
         "birthday":"MM-DD-YYYY"
       }, 
-      id2: {
+      "id2": {
         "name":"xxx"
         "address": "yyy"
         "phoneNumber":"zzz"
         "email": "aaa"
         "birthday":"MM-DD-YYYY"
       }
-    ]
   }
   UPDATE # note, any number of fields can be provided 
   req. 
   {
-      id: { 
+      "id": { 
         "name":"xxx"
         "address": "yyy"
         "phoneNumber":"zzz"
@@ -71,7 +70,7 @@ endpoints
   DELETE 
   req. 
   {
-    id: 123 
+    "id": 123 
   }
   resp. 
   200 OK 
