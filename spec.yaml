@@ -10,7 +10,7 @@ endpoints
     resp.   
     200 OK 
     {
-      "userId":123
+      "UserID":123
     }
     409 User already exits  
     410 bad request
@@ -19,51 +19,53 @@ endpoints
   POST
   req.
   {
-    "keyID": { 
-      "userId": xxx
-      "key": xxx # I think actually this is an optional field(as it'll be empty on a post), but the front end needs to know about it in order to perform updates. 
+    "KeyID": { 
+      "UserId": xxx
+      "Key": xxx # I think actually this is an optional field(as it'll be empty on a post), but the front end needs to know about it in order to perform updates. 
     }
     "name":"xxx" 
-    "address": "yyy" ##optional
-    "phoneNumber":"zzz"
-    "email": "aaa"
-    "birthday":"MM-DD-YYYY"
+    "Address": "yyy" ##optional
+    "PhoneNumber":"zzz"
+    "Email": "aaa"
+    "Birthday":"MM-DD-YYYY"
   }
   resp.
   200 OK 
   409 contact Exists
   note the key is an integer 
   {
-    "userId": xxx
-    "key": xxx # I think actually this is an optional field(as it'll be empty on a post), but the front end needs to know about it in order to perform updates. 
+    "UserId": xxx
+    "Key": xxx # I think actually this is an optional field(as it'll be empty on a post), but the front end needs to know about it in order to perform updates. 
   }
   GET
   req.
-  no body
+  {
+    "UserId": xxx
+  }
   resp.
   {
-      "data": [ 
+      "Data": [ 
         { 
-        "keyID": { 
-          "userId": xxx
-          "key": xxx # I think actually this is an optional field(as it'll be empty on a post), but the front end needs to know about it in order to perform updates. 
+        "KeyID": { 
+          "UserId": xxx
+          "Key": xxx # I think actually this is an optional field(as it'll be empty on a post), but the front end needs to know about it in order to perform updates. 
         }
-        "name":"xxx"
-        "address": "yyy"
-        "phoneNumber":"zzz"
-        "email": "aaa"
-        "birthday":"MM-DD-YYYY"
+        "Name":"xxx"
+        "Address": "yyy"
+        "PhoneNumber":"zzz"
+        "Email": "aaa"
+        "Birthday":"MM-DD-YYYY"
         }, 
         {
-          "keyID": { 
-            "userId": xxx
-            "key": xxx # I think actually this is an optional field(as it'll be empty on a post), but the front end needs to know about it in order to perform updates. 
+          "KeyID": { 
+            "UserId": xxx
+            "Key": xxx # I think actually this is an optional field(as it'll be empty on a post), but the front end needs to know about it in order to perform updates. 
           }
-          "name":"xxx"
-          "address": "yyy"
-          "phoneNumber":"zzz"
-          "email": "aaa"
-          "birthday":"MM-DD-YYYY"
+          "Name":"xxx"
+          "Address": "yyy"
+          "PhoneNumber":"zzz"
+          "Email": "aaa"
+          "Birthday":"MM-DD-YYYY"
         }
       ]
   }
@@ -71,13 +73,13 @@ endpoints
   req. 
   {
       { 
-        "keyID": { 
-          "userId": xxx
-          "key": xxx # I think actually this is an optional field(as it'll be empty on a post), but the front end needs to know about it in order to perform updates. 
+        "KeyID": { 
+          "UserId": xxx
+          "Key": xxx # I think actually this is an optional field(as it'll be empty on a post), but the front end needs to know about it in order to perform updates. 
         }
-        "name": "xxx"
-        "address": "yyy"
-        "phoneNumber":"zzz"
+        "Name": "xxx"
+        "Address": "yyy"
+        "PhoneNumber":"zzz"
       }, 
   }
   resp. 
@@ -86,10 +88,14 @@ endpoints
   DELETE 
   req. 
   {
-    "userId": 123, # UserId refers to the uuid of the actual enduser
-    "key": 456, # Key is simply the primary key refering to this contact, used in Updates and deletes
+    "UserId": 123, # UserId refers to the uuid of the actual enduser
+    "Key": 456, # Key is simply the primary key refering to this contact, used in Updates and deletes
   }
   resp. 
   200 OK 
   404 User Not Found 
+  {
+    "UserId": 123, # UserId refers to the uuid of the actual enduser
+    "Key": 456, # Key is simply the primary key refering to this contact, used in Updates and deletes
+  }
 

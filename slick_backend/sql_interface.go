@@ -116,7 +116,7 @@ func (handler *SQLiteHandler) DeleteUser(logininfo LoginInfo) (int, error) {
 //
 //
 //
-func (handler *SQLiteHandler) InsertContact(userID int, contact Contact) (int, error) {
+func (handler *SQLiteHandler) InsertContact(contact Contact) (int, error) {
 	stmt, err := handler.db.Prepare(`
 	INSERT INTO contacts VALUES(
 		DEFAULT, {userID}, {contact.name}, {contact.address}, {contact.phoneNumber}, 
@@ -177,15 +177,19 @@ func (handler *SQLiteHandler) GetContacts(userID int) ([]Contact, error) {
 	return contact_slice, nil
 }
 
-func (handler *SQLiteHandler) DeleteContact(userID int, contact Contact) error {
+func (handler *SQLiteHandler) DeleteContact(contact Contact) (int, error) {
 	stmt, err := handler.db.Prepare(`
 	DELETE FROM contacts 
 	WHERE contactID = {contact.key}
 	`)
 	if err != nil {
-		return err
+		return -1, err
 	}
 	_, err = stmt.Exec()
-	return err
+	if err != nil {
+		return -1, err
+	}
+	// TODO: Figure out the id that u deleted and return it
+	return -1, nil
 
 }
