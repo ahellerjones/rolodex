@@ -19,8 +19,10 @@ endpoints
   POST
   req.
   {
-    "userId": xxx
-    "key": xxx # I think actually this is an optional field(as it'll be empty on a post), but the front end needs to know about it in order to perform updates. 
+    "keyID": { 
+      "userId": xxx
+      "key": xxx # I think actually this is an optional field(as it'll be empty on a post), but the front end needs to know about it in order to perform updates. 
+    }
     "name":"xxx" 
     "address": "yyy" ##optional
     "phoneNumber":"zzz"
@@ -32,34 +34,48 @@ endpoints
   409 contact Exists
   note the key is an integer 
   {
-    "key":1234
+    "userId": xxx
+    "key": xxx # I think actually this is an optional field(as it'll be empty on a post), but the front end needs to know about it in order to perform updates. 
   }
   GET
   req.
   no body
   resp.
   {
-      
-      "id": { 
+      "data": [ 
+        { 
+        "keyID": { 
+          "userId": xxx
+          "key": xxx # I think actually this is an optional field(as it'll be empty on a post), but the front end needs to know about it in order to perform updates. 
+        }
         "name":"xxx"
         "address": "yyy"
         "phoneNumber":"zzz"
         "email": "aaa"
         "birthday":"MM-DD-YYYY"
-      }, 
-      "id2": {
-        "name":"xxx"
-        "address": "yyy"
-        "phoneNumber":"zzz"
-        "email": "aaa"
-        "birthday":"MM-DD-YYYY"
-      }
+        }, 
+        {
+          "keyID": { 
+            "userId": xxx
+            "key": xxx # I think actually this is an optional field(as it'll be empty on a post), but the front end needs to know about it in order to perform updates. 
+          }
+          "name":"xxx"
+          "address": "yyy"
+          "phoneNumber":"zzz"
+          "email": "aaa"
+          "birthday":"MM-DD-YYYY"
+        }
+      ]
   }
   UPDATE # note, any number of fields can be provided 
   req. 
   {
-      "id": { 
-        "name":"xxx"
+      { 
+        "keyID": { 
+          "userId": xxx
+          "key": xxx # I think actually this is an optional field(as it'll be empty on a post), but the front end needs to know about it in order to perform updates. 
+        }
+        "name": "xxx"
         "address": "yyy"
         "phoneNumber":"zzz"
       }, 
@@ -70,7 +86,8 @@ endpoints
   DELETE 
   req. 
   {
-    "id": 123 
+    "userId": 123, # UserId refers to the uuid of the actual enduser
+    "key": 456, # Key is simply the primary key refering to this contact, used in Updates and deletes
   }
   resp. 
   200 OK 

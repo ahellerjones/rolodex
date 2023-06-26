@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"log"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -11,209 +10,182 @@ type SQLiteHandler struct {
 	db *sql.DB
 }
 
-func main() {
-	//db = dbConnection("./rolodex.db")
-	}	
+func NewSQLiteHandler(dbPath string) (*SQLiteHandler, error) {
+	// pass in "./rolodex.db"
+	db, err := sql.Open("sqlite3", dbPath)
+	if err != nil {
+		return nil, err
+	}
+	// Do we need to initializeTables() here?
+	return &SQLiteHandler{db: db}, nil
+}
 
-	func dbConnection(dbPath string) (*SQLiteHandler, error) {
-		// pass in "./rolodex.db"
-		db, err := sql.Open("sqlite3", dbPath)
+func (handler *SQLiteHandler) initializeTables() error {
+	users, err := handler.db.Prepare(`
+		CREATE TABLE IF NOT EXISTS 
+		users(
+			userID AUTO_INCREMENT primary key,
+			login_name varchar(64) unique not null,
+			password varchar(256) not null
+		)`)
+	if err != nil {
+		return err
+	}
+	_, err = users.Exec()
+
+	contacts, err := handler.db.Prepare(`
+		CREATE TABLE IF NOT EXISTS 
+		contacts(
+			contactID AUTO_INCREMENT primary key,
+			userID int, 
+			name varchar(256),
+			address varchar(256),
+			phone_number varchar(64), 
+			email varchar(256), 
+			birthday varchar(256),
+			FOREIGN KEY (userID) REFERENCES users(userID) ON DELETE CASCADE
+		)`)
+	if err != nil {
+		return err
+	}
+	_, err = contacts.Exec()
+
+	return err
+}
+
+func (handler *SQLiteHandler) CheckUsernameExists(logininfo LoginInfo) (bool, error) {
+	// checks for only username match
+	check, err := handler.db.Query(`
+	SELECT {logininfo.user} FROM users
+	WHERE login_name = {logininfo.user}
+	`)
+	defer check.Close()
+	if err != nil {
+		return false, err
+	}
+
+	var username string
+	for check.Next() {
+		err := check.Scan(&username)
+		if err != nil && err != sql.ErrNoRows {
+			return false, err
+		}
+		return true, nil // Username exists
+	}
+	// if no username, then username does not exist
+	return false, nil // username does not exist
+}
+
+func (handler *SQLiteHandler) InsertUser(logininfo LoginInfo) (int, error) {
+	stmt, err := handler.db.Prepare(`
+	INSERT INTO users VALUES(
+		DEFAULT, {logininfo.user}, {logininfo.password}
+	)`)
+	if err != nil {
+		return 0, err
+	}
+	_, err = stmt.Exec() // I have no idea what this is supposed to do
+	if err != nil {
+		return 0, err
+	}
+	// TODO: Need to then perform a query to figure out what the userID was for the last operation
+
+	return 0, nil
+}
+
+// TODO: Do we even need this?
+// I dont even think I have logic to perform this
+func (handler *SQLiteHandler) DeleteUser(logininfo LoginInfo) (int, error) {
+	stmt, err := handler.db.Prepare(`
+	DELETE FROM users
+	WHERE userID = {logininfo.userID}
+	)`)
+	if err != nil {
+		return 0, err
+	}
+	_, err = stmt.Exec()
+	if err != nil {
+		return 0, err
+	}
+	// Do some shit like finding the userID that you just used or whatever
+	return 0, err
+}
+
+//
+//
+//
+//
+//
+func (handler *SQLiteHandler) InsertContact(userID int, contact Contact) (int, error) {
+	stmt, err := handler.db.Prepare(`
+	INSERT INTO contacts VALUES(
+		DEFAULT, {userID}, {contact.name}, {contact.address}, {contact.phoneNumber}, 
+		{contact.email}, {contact.birthday}
+	)
+	`)
+	if err != nil { // TODO: This probably gives SQLnoRows, just watch out
+		return 0, err
+	}
+	_, err = stmt.Exec()
+	if err != nil {
+		return 0, err
+	}
+	// fetch ID of last record inserted
+	// make sure this is the contact ID and not the user ID
+	//TODO: Find the last ID used
+	return 0, nil
+}
+
+func (handler *SQLiteHandler) GetContacts(userID int) ([]Contact, error) {
+	stmt, err := handler.db.Query(`
+	SELECT * FROM contacts
+	WHERE userID = {userID}
+	ORDER BY name desc
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	var key int
+	var name string
+	var address string
+	var phoneNumber string
+	var email string
+	var birthday string
+	contact_slice := []Contact{}
+	// iterate through each and create a contact
+	for stmt.Next() {
+		err := stmt.Scan(&key, &name, &address, &phoneNumber, &email, &birthday)
 		if err != nil {
 			return nil, err
 		}
-	
-		return &SQLiteHandler{db: db}, nil
+		// return userID
+		// Fill return struct with the values.
+		contact_slice = append(contact_slice, Contact{
+			KeyID: Identification{
+				UserID: userID,
+				Key:    key,
+			},
+			Name:        name,
+			Address:     address,
+			PhoneNumber: phoneNumber,
+			Email:       email,
+			Birthday:    birthday,
+		})
 	}
-	
-	func (handler *SQLiteHandler) initializeTables() error {
-		users, err := handler.db.Prepare("
-			CREATE TABLE IF NOT EXISTS 
-			users(
-				userID AUTO_INCREMENT primary key,
-				login_name varchar(64) unique not null,
-				password varchar(256) not null
-			)")
-		if err != nil {
-			return err
-		}
-		_, err = users.Exec()
+	return contact_slice, nil
+}
 
-		contacts, err := handler.db.Prepare("
-			CREATE TABLE IF NOT EXISTS 
-			contacts(
-				contactID AUTO_INCREMENT primary key,
-				userID int, 
-				name varchar(256),
-				address varchar(256),
-				phone_number varchar(64), 
-				email varchar(256), 
-				birthday varchar(256),
-				FOREIGN KEY (userID) REFERENCES users(userID) ON DELETE CASCADE
-			)")
-		if err != nil {
-			return err
-		}
-		_, err = contacts.Exec()
-
+func (handler *SQLiteHandler) DeleteContact(userID int, contact Contact) error {
+	stmt, err := handler.db.Prepare(`
+	DELETE FROM contacts 
+	WHERE contactID = {contact.key}
+	`)
+	if err != nil {
 		return err
 	}
+	_, err = stmt.Exec()
+	return err
 
-	func (handler, *SQLiteHandler) checkUserExists(logininfo LoginInfo) error { 
-		// checks username and password for existence
-		check, err := handler.db.Query(f"
-		SELECT userID FROM users
- 		WHERE login_name = {logininfo.user} AND password = {logininfo.password}
-		")
-		defer check.Close()
-
-		var userID int
-		for check.Next() {
-			err := rows.Scan(&userID)
-			if err != nil {
-				return err
-			}
-			return userID 
-		}
-		// if no user and password match, user does not exist
-		return nil
-	}
-
-	func (handler, *SQLiteHandler) checkUsernameExists(logininfo LoginInfo) error{
-		// checks for only username match
-		check, err := handler.db.Query(f"
-		SELECT {logininfo.user} FROM users
- 		WHERE login_name = {logininfo.user}
-		")
-		defer check.Close()
-
-		var username string
-		for check.Next() {
-			err := rows.Scan(&username)
-			if err != nil {
-				return err
-			}
-			return username 
-		}
-		// if no username, then username does not exist
-		return nil
-	}
-
-	func (handler, *SQLiteHandler) insertUser(logininfo LoginInfo) error{
-		insert, err := handler.db.Prepare(f"
-		INSERT INTO users VALUES(
-			DEFAULT, {logininfo.user}, {logininfo.password}
-		)")
-		if err != nil {
-			return err
-		}
-		_, err = contacts.Exec()
-		if err != nil {
-			return err
-		}
-		id, err = _.LastInsertID()
-		if err != nil {
-			return err
-		}
-
-		return id
-	}
-
-	func (handler, *SQLiteHandler) deleteUser(logininfo LoginInfo) error{
-		delete, err := handler.db.Prepare(f"
-		DELETE FROM users
-		WHERE userID = {logininfo.userID}
-		)")
-		if err != nil {
-			return err
-		}
-		_, err = update.Exec()
-		if err != nil {
-			return err
-		}
-		id, err = _.LastInsertID()
-		if err != nil {
-			return err
-		}
-		return id
-	}
-// 
-//
-//
-//
-//
-	func (handler, *SQLiteHandler) insertContact(userID int, contact Contact) error{
-		insert, err := handler.db.Prepare(f"
-		INSERT INTO contacts VALUES(
-			DEFAULT, {userID}, {contact.name}, {contact.address}, {contact.phoneNumber}, 
-			{contact.email}, {contact.birthday}
-		)
-		")
-		if err != nil {
-			return err
-		}
-		_, err = update.Exec()
-		if err != nil {
-			return err
-		}
-		// fetch ID of last record inserted
-		// make sure this is the contact ID and not the user ID
-		id, err = _.LastInsertID()
-		if err != nil {
-			return err
-		}
-		return id
-	}
-
-	##func (handler, *SQLiteHandler) getContacts(userID int) error{
-		
-		contactlist, err := handler.db.Query(f"
-		SELECT * FROM contacts
-		WHERE userID = {userID}
-		ORDER BY name desc
-		")
-		defer contactlist.Close()
-
-		var contactId int 
-		var name string 
-		var address string 
-		var phoneNumber string 
-		var email string 
-		var birthday string
-
-		// iterate through each and create a contact
-		for contactList.Next() {
-			err := rows.Scan(&contactID, &name, &address, &phoneNumber, &email, &birthday)
-			if err != nil {
-				return err
-			}
-			return userID
-		}
-		return nil 
-	}
-
-	func (handler, *SQLiteHandler) deleteContext(userID int, contact Contact) error{
-		delete, err := handler.db.Prepare(f"
-		DELETE FROM contacts 
-		WHERE contactID = {contact.key}
-		")
-		if err != nil {
-			return err
-		}
-		_, err = update.Exec()
-		if err != nil {
-			return err
-		}
-
-		return err
-
-
-
-	
-
-
-
-
-
-	}
-
-
+}
