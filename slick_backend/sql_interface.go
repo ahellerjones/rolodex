@@ -164,7 +164,7 @@ func (handler *SQLiteHandler) GetContacts(userID int) ([]Contact, error) {
 		// return userID
 		// Fill return struct with the values.
 		contact_slice = append(contact_slice, Contact{
-			KeyID: Identification{
+			ContactID: Identification{
 				UserID: userID,
 				Key:    key,
 			},

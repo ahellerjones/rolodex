@@ -51,7 +51,5 @@ func main() {
 }
 
 func landingHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "../sexy_frontend/dist/index.html")
+	http.ServeFile(w, r, "../sexy_frontend/index.html")
 }
-
-// rest of handlers are in their own respective files

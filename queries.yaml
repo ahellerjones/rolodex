@@ -37,8 +37,6 @@ type Identification struct {
 }
 
 type Contact struct { 
-	userId Identification `json:userId`
-	key int `json:key`
 	name string `json:name`
 	address string `json:address`
 	phoneNumber string `json:phoneNumber`
