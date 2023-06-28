@@ -194,8 +194,7 @@ func (handler *SQLiteHandler) DeleteContact(contact Contact) (int, error) {
 	if err != nil {
 		if err == sql.ErrNoRows{
 			return contact.ContactID.Key, nil
-		} 
-		else {return -1, err}
+		} else {return -1, err}
 	}
 
 	// can just return given contact ID since error would be thrown if there was a problem
