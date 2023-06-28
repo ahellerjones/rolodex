@@ -25,7 +25,7 @@ func (handler *SQLiteHandler) initializeTables() error {
 	users, err := handler.db.Prepare(`
 		CREATE TABLE IF NOT EXISTS 
 		users(
-			userID AUTO_INCREMENT primary key,
+			user_id AUTO_INCREMENT primary key,
 			login_name varchar(64) unique not null,
 			password varchar(256) not null
 		)`)
@@ -37,8 +37,8 @@ func (handler *SQLiteHandler) initializeTables() error {
 	contacts, err := handler.db.Prepare(`
 		CREATE TABLE IF NOT EXISTS 
 		contacts(
-			contactID AUTO_INCREMENT primary key,
-			userID int, 
+			contact_id AUTO_INCREMENT primary key,
+			user_id int, 
 			name varchar(256),
 			address varchar(256),
 			phone_number varchar(64), 
@@ -56,26 +56,31 @@ func (handler *SQLiteHandler) initializeTables() error {
 
 func (handler *SQLiteHandler) CheckUsernameExists(logininfo LoginInfo) (bool, error) {
 	// checks for only username match
-	check, err := handler.db.Query(`
-	SELECT {logininfo.user} FROM users
-	WHERE login_name = {logininfo.user}
+	stmt, err := handler.db.Query(`
+	SELECT ? FROM users
+	WHERE login_name = ?
 	`)
-	defer check.Close()
+	defer stmt.Close()
 	if err != nil {
 		return false, err
 	}
 
-	var username string
+	user := logininfo.user
+	_, err = stmt.Exec(user)
+
+	/*var username string
 	for check.Next() {
 		err := check.Scan(&username)
 		if err != nil && err != sql.ErrNoRows {
 			return false, err
 		}
 		return true, nil // Username exists
-	}
+	}*/
 	// if no username, then username does not exist
 	return false, nil // username does not exist
 }
+
+func 
 
 func (handler *SQLiteHandler) InsertUser(logininfo LoginInfo) (int, error) {
 	stmt, err := handler.db.Prepare(`
@@ -112,28 +117,37 @@ func (handler *SQLiteHandler) DeleteUser(logininfo LoginInfo) (int, error) {
 	return 0, err
 }
 
-//
-//
-//
-//
-//
 func (handler *SQLiteHandler) InsertContact(contact Contact) (int, error) {
 	stmt, err := handler.db.Prepare(`
 	INSERT INTO contacts VALUES(
-		DEFAULT, {userID}, {contact.name}, {contact.address}, {contact.phoneNumber}, 
-		{contact.email}, {contact.birthday}
+		DEFAULT, ?, ?, ?, ?, ?, ?
 	)
 	`)
 	if err != nil { // TODO: This probably gives SQLnoRows, just watch out
 		return 0, err
 	}
-	_, err = stmt.Exec()
+	defer stmt.Close()
+
+	_, err = stmt.Exec(contact.ContactId.UserId, contact.Name, contact.Address,
+	contat.PhoneNumber, contact.Email, contact.Birthday)
 	if err != nil {
 		return 0, err
 	}
+
+	var maxID int
+	qry, err = handler.db.QueryRow(`
+	SELECT MAX(user_id) FROM contacts
+	`
+	)
+	if err != nil {
+		return 0, err
+	}
+
+	
 	// fetch ID of last record inserted
 	// make sure this is the contact ID and not the user ID
 	//TODO: Find the last ID used
+	// why
 	return 0, nil
 }
 
@@ -179,14 +193,27 @@ func (handler *SQLiteHandler) GetContacts(userID int) ([]Contact, error) {
 }
 
 func (handler *SQLiteHandler) DeleteContact(contact Contact) (int, error) {
-	stmt, err := handler.db.Prepare(`
-	DELETE FROM contacts 
-	WHERE contactID = {contact.key}
+	query, err := handler.db.Prepare(`
+	SELECT contact_id FROM contacts
+	WHERE contact_id = ?
 	`)
 	if err != nil {
 		return -1, err
 	}
-	_, err = stmt.Exec()
+	defer query.close()
+
+	id_ret, err := query.Query(contact.ContactID)
+	if err != nil {
+		return -1, err
+	}
+	stmt, err := handler.db.Prepare(`
+	DELETE FROM contacts 
+	WHERE contact_id = ?
+	`)
+	if err != nil {
+		return -1, err
+	}
+	_, err = stmt.Exec(contact.key)
 	if err != nil {
 		return -1, err
 	}
