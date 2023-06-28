@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 )
 
@@ -35,9 +36,17 @@ func main() {
 	http.HandleFunc("/", landingHandler)
 	http.HandleFunc("/login", handler.LoginHandler)
 	http.HandleFunc("/contacts", handler.ContactsHandler)
+	// Get preferred outbound ip of this machine
+	conn, err := net.Dial("udp", "8.8.8.8:80")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer conn.Close()
+
+	localAddr := conn.LocalAddr().(*net.UDPAddr)
 
 	// Start the server on port 8080
-	log.Println("Server listening on port 8080")
+	log.Println(fmt.Sprintf("Server listening on %s:8080", localAddr.IP))
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 

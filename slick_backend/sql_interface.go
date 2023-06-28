@@ -1,5 +1,6 @@
 package main
 
+//TODO: Need to fix all of the silly f strings, go doesn't support that but does have variations of it
 import (
 	"database/sql"
 

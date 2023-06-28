@@ -1,5 +1,5 @@
 module github.com/ahellerjones/rolodex~
 
-go 1.18
+go 1.17
 
 require github.com/mattn/go-sqlite3 v1.14.17 // indirect
