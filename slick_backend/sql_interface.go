@@ -74,8 +74,6 @@ func (handler *SQLiteHandler) CheckUsernameExists(logininfo LoginInfo) (bool, er
 	return &username, nil // username exists
 }
 
-func 
-
 func (handler *SQLiteHandler) InsertUser(logininfo LoginInfo) (int, error) {
 	stmt, err := handler.db.Prepare(`
 	INSERT INTO users VALUES(
@@ -105,7 +103,7 @@ func (handler *SQLiteHandler) InsertContact(contact Contact) (int, error) {
 	defer stmt.Close()
 
 	_, err = stmt.Exec(contact.ContactId.UserId, contact.Name, contact.Address,
-	contat.PhoneNumber, contact.Email, contact.Birthday)
+		contat.PhoneNumber, contact.Email, contact.Birthday)
 	if err != nil {
 		return 0, err
 	}
@@ -113,8 +111,7 @@ func (handler *SQLiteHandler) InsertContact(contact Contact) (int, error) {
 	var lastID int
 	qry, err = handler.db.QueryRow(`
 	SELECT MAX(contact_id) FROM contacts
-	`
-	).Scan(&lastId)
+	`).Scan(&lastId)
 	if err != nil {
 		return 0, err
 	}
@@ -192,9 +189,11 @@ func (handler *SQLiteHandler) DeleteContact(contact Contact) (int, error) {
 
 	empty, err := handler.db.QueryRow(contact.ContactID.Key)
 	if err != nil {
-		if err == sql.ErrNoRows{
+		if err == sql.ErrNoRows {
 			return contact.ContactID.Key, nil
-		} else {return -1, err}
+		} else {
+			return -1, err
+		}
 	}
 
 	// can just return given contact ID since error would be thrown if there was a problem
