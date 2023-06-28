@@ -56,28 +56,22 @@ func (handler *SQLiteHandler) initializeTables() error {
 
 func (handler *SQLiteHandler) CheckUsernameExists(logininfo LoginInfo) (bool, error) {
 	// checks for only username match
-	stmt, err := handler.db.Query(`
-	SELECT ? FROM users
+	stmt, err := handler.db.Prepare(`
+	SELECT login_name FROM users
 	WHERE login_name = ?
 	`)
+	if err != nil {
+		return false, err
+	}
 	defer stmt.Close()
+
+	var username string
+	_, err = stmt.Query(logininfo.Username).Scan(&username)
 	if err != nil {
 		return false, err
 	}
 
-	user := logininfo.user
-	_, err = stmt.Exec(user)
-
-	/*var username string
-	for check.Next() {
-		err := check.Scan(&username)
-		if err != nil && err != sql.ErrNoRows {
-			return false, err
-		}
-		return true, nil // Username exists
-	}*/
-	// if no username, then username does not exist
-	return false, nil // username does not exist
+	return &username, nil // username exists
 }
 
 func 
@@ -99,24 +93,6 @@ func (handler *SQLiteHandler) InsertUser(logininfo LoginInfo) (int, error) {
 	return 0, nil
 }
 
-// TODO: Do we even need this?
-// I dont even think I have logic to perform this
-func (handler *SQLiteHandler) DeleteUser(logininfo LoginInfo) (int, error) {
-	stmt, err := handler.db.Prepare(`
-	DELETE FROM users
-	WHERE userID = {logininfo.userID}
-	)`)
-	if err != nil {
-		return 0, err
-	}
-	_, err = stmt.Exec()
-	if err != nil {
-		return 0, err
-	}
-	// Do some shit like finding the userID that you just used or whatever
-	return 0, err
-}
-
 func (handler *SQLiteHandler) InsertContact(contact Contact) (int, error) {
 	stmt, err := handler.db.Prepare(`
 	INSERT INTO contacts VALUES(
@@ -134,33 +110,30 @@ func (handler *SQLiteHandler) InsertContact(contact Contact) (int, error) {
 		return 0, err
 	}
 
-	var maxID int
+	var lastID int
 	qry, err = handler.db.QueryRow(`
-	SELECT MAX(user_id) FROM contacts
+	SELECT MAX(contact_id) FROM contacts
 	`
-	)
+	).Scan(&lastId)
 	if err != nil {
 		return 0, err
 	}
 
-	
-	// fetch ID of last record inserted
-	// make sure this is the contact ID and not the user ID
-	//TODO: Find the last ID used
-	// why
-	return 0, nil
+	return &lastID, nil
 }
 
 func (handler *SQLiteHandler) GetContacts(userID int) ([]Contact, error) {
-	stmt, err := handler.db.Query(`
+	stmt, err := handler.db.Prepare(`
 	SELECT * FROM contacts
-	WHERE userID = {userID}
+	WHERE userID = ?
 	ORDER BY name desc
 	`)
 	if err != nil {
 		return nil, err
 	}
 	defer stmt.Close()
+
+	qry, err := handler.db.Query(userID)
 
 	var key int
 	var name string
@@ -170,8 +143,8 @@ func (handler *SQLiteHandler) GetContacts(userID int) ([]Contact, error) {
 	var birthday string
 	contact_slice := []Contact{}
 	// iterate through each and create a contact
-	for stmt.Next() {
-		err := stmt.Scan(&key, &name, &address, &phoneNumber, &email, &birthday)
+	for qry.Next() {
+		err := qry.Scan(&key, &name, &address, &phoneNumber, &email, &birthday)
 		if err != nil {
 			return nil, err
 		}
@@ -193,19 +166,6 @@ func (handler *SQLiteHandler) GetContacts(userID int) ([]Contact, error) {
 }
 
 func (handler *SQLiteHandler) DeleteContact(contact Contact) (int, error) {
-	query, err := handler.db.Prepare(`
-	SELECT contact_id FROM contacts
-	WHERE contact_id = ?
-	`)
-	if err != nil {
-		return -1, err
-	}
-	defer query.close()
-
-	id_ret, err := query.Query(contact.ContactID)
-	if err != nil {
-		return -1, err
-	}
 	stmt, err := handler.db.Prepare(`
 	DELETE FROM contacts 
 	WHERE contact_id = ?
@@ -213,11 +173,30 @@ func (handler *SQLiteHandler) DeleteContact(contact Contact) (int, error) {
 	if err != nil {
 		return -1, err
 	}
-	_, err = stmt.Exec(contact.key)
+	defer stmt.Close()
+
+	_, err := stmt.Exec(contact.ContactID.Key)
 	if err != nil {
 		return -1, err
 	}
-	// TODO: Figure out the id that u deleted and return it
-	return -1, nil
+	defer _.Close()
 
+	// Confirm ID was deleted
+	prep_empty, err := handler.db.Prepare(`
+	SELECT user_id FROM contacts WHERE user_id = ?
+	`)
+	if err != nil {
+		return -1, err
+	}
+	defer prep_empty.Close()
+
+	empty, err := handler.db.QueryRow(contact.ContactID.Key)
+	if err != nil {
+		if err == sql.ErrNoRows{
+			return contact.ContactID.Key, nil
+		} 
+		else {return -1, err}
+	}
+
+	// can just return given contact ID since error would be thrown if there was a problem
 }
