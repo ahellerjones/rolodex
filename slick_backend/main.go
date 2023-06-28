@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"net"
 	"net/http"
 )
 
@@ -33,23 +32,23 @@ func main() {
 	}
 
 	// Define the HTTP endpoints and their corresponding handler functions
-	http.HandleFunc("/", landingHandler)
+	// http.HandleFunc("/", landingHandler)
 	http.HandleFunc("/login", handler.LoginHandler)
 	http.HandleFunc("/contacts", handler.ContactsHandler)
 	// Get preferred outbound ip of this machine
-	conn, err := net.Dial("udp", "8.8.8.8:80")
+	//conn, err := net.Dial("udp", "8.8.8.8:80")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer conn.Close()
-
-	localAddr := conn.LocalAddr().(*net.UDPAddr)
+	landingDir := "../sexy_frontend/dist"
+	fs := http.FileServer(http.Dir(landingDir))
+	http.Handle("/", fs)
 
 	// Start the server on port 8080
-	log.Println(fmt.Sprintf("Server listening on %s:8080", localAddr.IP))
+	log.Println(fmt.Sprintf("Server listening on :8080"))
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 func landingHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "../sexy_frontend/index.html")
+	http.ServeFile(w, r, "sexy_frontend/index.html")
 }
