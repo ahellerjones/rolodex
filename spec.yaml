@@ -19,15 +19,17 @@ endpoints
   POST
   req.
   {
-    "KeyID": { 
+    "ContactID": { 
       "UserId": xxx
       "Key": xxx # I think actually this is an optional field(as it'll be empty on a post), but the front end needs to know about it in order to perform updates. 
     }
-    "name":"xxx" 
-    "Address": "yyy" ##optional
-    "PhoneNumber":"zzz"
-    "Email": "aaa"
-    "Birthday":"MM-DD-YYYY"
+    "Contact": { 
+      "name":"xxx" 
+      "Address": "yyy" ##optional
+      "PhoneNumber":"zzz"
+      "Email": "aaa"
+      "Birthday":"MM-DD-YYYY"
+    }
   }
   resp.
   200 OK 
@@ -46,7 +48,7 @@ endpoints
   {
       "Data": [ 
         { 
-        "KeyID": { 
+        "ContactID": { 
           "UserId": xxx
           "Key": xxx # I think actually this is an optional field(as it'll be empty on a post), but the front end needs to know about it in order to perform updates. 
         }
@@ -57,7 +59,7 @@ endpoints
         "Birthday":"MM-DD-YYYY"
         }, 
         {
-          "KeyID": { 
+          "ContactID": { 
             "UserId": xxx
             "Key": xxx # I think actually this is an optional field(as it'll be empty on a post), but the front end needs to know about it in order to perform updates. 
           }
@@ -73,7 +75,7 @@ endpoints
   req. 
   {
       { 
-        "KeyID": { 
+        "ContactID": { 
           "UserId": xxx
           "Key": xxx # I think actually this is an optional field(as it'll be empty on a post), but the front end needs to know about it in order to perform updates. 
         }
