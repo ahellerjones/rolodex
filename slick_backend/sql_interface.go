@@ -120,20 +120,34 @@ func (handler *SQLiteHandler) DeleteUser(logininfo LoginInfo) (int, error) {
 func (handler *SQLiteHandler) InsertContact(contact Contact) (int, error) {
 	stmt, err := handler.db.Prepare(`
 	INSERT INTO contacts VALUES(
-		DEFAULT, {userID}, {contact.name}, {contact.address}, {contact.phoneNumber}, 
-		{contact.email}, {contact.birthday}
+		DEFAULT, ?, ?, ?, ?, ?, ?
 	)
 	`)
 	if err != nil { // TODO: This probably gives SQLnoRows, just watch out
 		return 0, err
 	}
-	_, err = stmt.Exec()
+	defer stmt.Close()
+
+	_, err = stmt.Exec(contact.ContactId.UserId, contact.Name, contact.Address,
+	contat.PhoneNumber, contact.Email, contact.Birthday)
 	if err != nil {
 		return 0, err
 	}
+
+	var maxID int
+	qry, err = handler.db.QueryRow(`
+	SELECT MAX(user_id) FROM contacts
+	`
+	)
+	if err != nil {
+		return 0, err
+	}
+
+	
 	// fetch ID of last record inserted
 	// make sure this is the contact ID and not the user ID
 	//TODO: Find the last ID used
+	// why
 	return 0, nil
 }
 
@@ -188,11 +202,10 @@ func (handler *SQLiteHandler) DeleteContact(contact Contact) (int, error) {
 	}
 	defer query.close()
 
-	id_ret, err := query.Exec(contact.ContactID)
+	id_ret, err := query.Query(contact.ContactID)
 	if err != nil {
 		return -1, err
 	}
-	defer 
 	stmt, err := handler.db.Prepare(`
 	DELETE FROM contacts 
 	WHERE contact_id = ?
