@@ -10,6 +10,7 @@ type LoginInfo struct {
   returns:  
     - pass back userId, nill error
     - nil userId, err if does not exist 
+    
 - check if username exists
   params: 
     - LoginInfo struct
