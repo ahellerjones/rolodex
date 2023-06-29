@@ -18,3 +18,5 @@ class SQLiteHandler:
         result = cursor.fetchall()
         cursor.close()
         return result
+
+
