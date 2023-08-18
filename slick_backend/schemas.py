@@ -30,7 +30,7 @@ class ContactCreate(ContactBase):
 # and the owner's id of the contact when we return. 
 class Contact(ContactBase):
     id: int
-    owner_id: int
+    owner: int
 
     class Config:
         orm_mode = True
@@ -42,7 +42,7 @@ class ContactUpdate(ContactBase):
 # When we want to delete 
 class ContactDelete(ContactBase): 
     id: int
-    owner_id: int
+    owner: int
 
 
 # It is left as an exercise to the reader to figure out 
