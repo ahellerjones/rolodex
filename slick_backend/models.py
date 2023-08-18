@@ -14,7 +14,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True)
     hashed_password = Column(String)
-    #contacts = relationship("Contact", back_populates="user")
+    contacts = relationship("Contact", back_populates="owner")
     # This is what relates a user to contacts,
     # Each user will contain a list of contacts
 
@@ -27,8 +27,8 @@ class Contact (Base):
     phoneNumber = Column(String,index=True)
     email = Column(String,index=True)
     birthday = Column(String,index=True)
-    user_id = Column(Integer,ForeignKey('users.id') )
-    #user = relationship('User', back_populates='contacts')
+    owner_id = Column(Integer,ForeignKey('users.id') )
+    owner = relationship('User', back_populates='contacts')
 
 
 

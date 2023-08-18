@@ -39,7 +39,12 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
 
+@app.post("/users/{user_id}/contacts/", response_model=schemas.Contact)
+def post_contact(user_id: int, contact: schemas.ContactCreate, db: Session = Depends(get_db)):
+    return crud.create_contact(db, contact=contact, user_id=user_id)
+
 @app.get("/users/{user_id}/contacts/", response_model=schemas.Contact)
-def create_contact_for_user(user_id: int, contact: schemas.ContactCreate, db: Session = Depends(get_db)
+def read_contacts_for_user(user_id: int, db: Session = Depends(get_db)
 ):
-    return crud.create_contact(db=db, contact=contact, user_id=user_id)
+    return crud.read_contacts_for_user(db, user_id)
+    #return crud.create_contact(db=db, contact=contact, user_id=user_id)

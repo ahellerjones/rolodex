@@ -28,10 +28,6 @@ def read_user_by_username(db: Session, username: str):
 def read_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.User).offset(skip).limit(limit).all()
 
-def read_contacts_for_user(db: Session, user_id: int): 
-    # I think this is how we do this. 
-    return db.query(models.Contact).filter(models.Contact.owner.id == user_id).all()
-
 def create_contact(db: Session, contact: schemas.ContactCreate, user_id: int): 
     db_contact_obj = models.Contact(**contact.dict(), owner_id=user_id) # Unfurl the contact into a dict and put it into a Contact model
     db.add(db_contact_obj)
@@ -39,7 +35,11 @@ def create_contact(db: Session, contact: schemas.ContactCreate, user_id: int):
     db.refresh(db_contact_obj)
     return db_contact_obj
 
+def read_contacts_for_user(db: Session, user_id: int): 
+    # I think this is how we do this. 
+    return db.query(models.Contact).filter(models.Contact.owner_id == user_id).all()
+
 def read_contact_for_user_id(db: Session, user_id: int, contact_id: int): 
-    return db.query(models.Contact).filter(models.Contact.id == contact_id, models.Contact.owner.id == user_id) # I have no idea what im doing 
+    return db.query(models.Contact).filter(models.Contact.id == contact_id, models.Contact.user_id == user_id) # I have no idea what im doing 
 
 # def update_contact_for_user_id(db: Session, user_id: int, contact_id: int): 
