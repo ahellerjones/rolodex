@@ -13,7 +13,7 @@ router = APIRouter()
 # This endpoint also ONLY WORKS for existing users, new users should post to 
 # `/signup`. We issue tokens here. 
 @router.post("/token") 
-async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(utils.get_db)):
+async def get_tocken(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(utils.get_db)):
     user = utils.authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -31,7 +31,7 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: 
 # This just simply signs up a user, they will need to login afterwards
 # This doesn't give back an access token unf. It might be able to but idk. 
 @router.post("/signup")
-async def post_users(user: schemas.UserCreate, db: Session = Depends(utils.get_db)):
+async def signup(user: schemas.UserCreate, db: Session = Depends(utils.get_db)):
     db_user = crud.read_user_by_username(db, username=user.username)
     if db_user:
         raise HTTPException(status_code=401, detail="Username already exists")
@@ -41,14 +41,6 @@ async def post_users(user: schemas.UserCreate, db: Session = Depends(utils.get_d
     user.password = utils.get_password_hash(user.password)
     return crud.create_user(db=db,user=user)
 
-# # Login
-# @router.post("/login")
-# async def post_users(user: schemas.UserCreate, db: Session = Depends(utils.get_db)):
-#     db_user = crud.read_user_by_username(db, username=user.username)
-#     if db_user:
-#         if user.password == db_user.hashed_password: 
-#             #TODO This seems like the place where we would demarcate whether a user is active or not
-#             # Which TBH is kind of stupid and they don't do anything with it in the docs, so I'm not going to worry about it.  
-#             return {"status": "OK"}
-#         raise HTTPException(status_code=401, detail="Incorrect Password")
-#     raise HTTPException(status_code=401, detail="Username not found")
+# @router.get("/users/me")
+# async def read_users_me(current_user: Annotated[schemas.User, Depends(utils.get_current_user)]):
+#     return current_user

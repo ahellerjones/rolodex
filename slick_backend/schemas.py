@@ -1,10 +1,5 @@
-from datetime import date
 from typing import Optional
 from pydantic import BaseModel
-from typing import Annotated
-from fastapi.security import OAuth2PasswordBearer
-
-
 
 # First we create a BaseModel class 
 # So that we can access the attributes of the model. 
@@ -42,11 +37,7 @@ class Contact(ContactBase):
 
 # For an update
 class ContactUpdate(ContactBase):
-    name: Optional[str] = None
-    address: Optional[str] = None
-    phoneNumber: Optional[str] = None
-    email: Optional[str] = None
-    birthday: Optional[str] = None
+    pass
 
 # When we want to delete 
 class ContactDelete(ContactBase): 

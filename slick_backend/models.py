@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, ForeignKey, Column, Integer, String, ForeignKeyConstraint
+from sqlalchemy import create_engine, ForeignKey, Column, Integer, String 
 
 engine = create_engine('sqlite:///sql_app.db', echo = True)
 from sqlalchemy.ext.declarative import declarative_base

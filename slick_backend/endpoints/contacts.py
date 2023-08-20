@@ -6,10 +6,6 @@ from sqlalchemy.orm import Session
 from typing_extensions import Annotated
 
 router = APIRouter()
-# @router.post("/users/{user_id}/contacts/", response_model=schemas.Contact)
-# def post_contact(user_id: int, contact: schemas.ContactCreate, db: Session = Depends(utils.get_db)):
-#     return crud.create_contact(db, contact=contact, user_id=user_id)
-
 
 @router.post("/users/me/contacts/", response_model=schemas.Contact)
 def post_contact_for_user(
@@ -38,19 +34,10 @@ def update_contact_for_user(
 @router.delete("/users/me/contacts/{contact_id}/")
 def update_contact_for_user(
     contact_id: int,
-    contact_delete: schemas.ContactDelete,
+    #contact_delete: schemas.ContactDelete, We could put this in in the future, 
+    # but don't really need it for now. 
     user: Annotated[schemas.User, Depends(utils.get_current_user)], 
     db: Session = Depends(utils.get_db)): 
 
     return crud.delete_contact(db=db, contact_id=contact_id, user_id=user.username)
 
-
-
-# Get a list of contacts for a specific user
-# @router.get("/users/{user_id}/contacts/", response_model=list[schemas.Contact])
-# def read_contacts_for_user(token: Annotated[str, Depends(utils.oauth2_scheme)], user_id: int, db: Session = Depends(utils.get_db)): 
-#     contacts = crud.read_contacts_for_user(db, user_id)
-#     if contacts.count() == 0: 
-#         return []
-#     else: 
-#         return contacts.all()
