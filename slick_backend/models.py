@@ -14,6 +14,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True)
     hashed_password = Column(String)
+    enabled = bool
     contacts = relationship("Contact", back_populates="owner")
     # This is what relates a user to contacts,
     # Each user will contain a list of contacts

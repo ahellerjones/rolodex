@@ -1,5 +1,9 @@
 from sqlalchemy.orm import Session
-from . import models, schemas
+import os, sys
+file_dir = os.path.dirname(__file__)
+sys.path.append(file_dir)
+import models
+import schemas
 
 # MODELS ARE HOW THE DATA IS ORGANIZED IN THE DBs
 # SCHEMAS ARE THE DATA THAT COMES IN OR OUT 
@@ -37,9 +41,9 @@ def create_contact(db: Session, contact: schemas.ContactCreate, user_id: int):
 
 def read_contacts_for_user(db: Session, user_id: int): 
     # I think this is how we do this. 
-    return db.query(models.Contact).filter(models.Contact.owner_id == user_id).all()
+    return db.query(models.Contact).filter(models.Contact.owner_id == user_id)
 
 def read_contact_for_user_id(db: Session, user_id: int, contact_id: int): 
-    return db.query(models.Contact).filter(models.Contact.id == contact_id, models.Contact.user_id == user_id) # I have no idea what im doing 
+    return db.query(models.Contact).filter(models.Contact.id == contact_id, models.Contact.owner_id == user_id) # I have no idea what im doing 
 
 # def update_contact_for_user_id(db: Session, user_id: int, contact_id: int): 

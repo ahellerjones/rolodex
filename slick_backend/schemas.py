@@ -1,6 +1,10 @@
 from datetime import date
 from typing import Optional
 from pydantic import BaseModel
+from typing import Annotated
+from fastapi.security import OAuth2PasswordBearer
+
+
 
 # First we create a BaseModel class 
 # So that we can access the attributes of the model. 
@@ -50,6 +54,7 @@ class ContactDelete(ContactBase):
 # User classes. 
 class UserBase(BaseModel):
     username: str
+    enabled = bool
 
 # Note, when we create, we need to supply the password
 class UserCreate(UserBase):
@@ -66,3 +71,5 @@ class User(UserBase):
         # NOT as a dictionary, but as an ORM model 
         # (basically just a class) 
         orm_mode = True
+
+
