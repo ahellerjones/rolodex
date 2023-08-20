@@ -15,10 +15,10 @@ from fastapi.security import OAuth2PasswordBearer
 # this is data that every model will inherit. 
 class ContactBase(BaseModel):
     name: str 
-    address: str
-    phoneNumber: str
-    email = str
-    birthday = str
+    address: Optional[str] = None
+    phoneNumber: Optional[str] = None
+    email: Optional[str] = None
+    birthday: Optional[str] = None
 
 # First we define what data a Contact needs to know in order 
 # to properly create it. Thankfully, everything within 
@@ -34,19 +34,23 @@ class ContactCreate(ContactBase):
 # and the owner's id of the contact when we return. 
 class Contact(ContactBase):
     id: int
-    owner_id: int
+    owner_id: str
 
     class Config:
         orm_mode = True
+        exclude_unset = True
 
 # For an update
 class ContactUpdate(ContactBase):
-    pass
+    name: Optional[str] = None
+    address: Optional[str] = None
+    phoneNumber: Optional[str] = None
+    email: Optional[str] = None
+    birthday: Optional[str] = None
 
 # When we want to delete 
 class ContactDelete(ContactBase): 
-    id: int
-    owner: int
+    pass
 
 
 # It is left as an exercise to the reader to figure out 
@@ -54,7 +58,6 @@ class ContactDelete(ContactBase):
 # User classes. 
 class UserBase(BaseModel):
     username: str
-    enabled = bool
 
 # Note, when we create, we need to supply the password
 class UserCreate(UserBase):
@@ -72,4 +75,10 @@ class User(UserBase):
         # (basically just a class) 
         orm_mode = True
 
+# Response models we'll use for issuing tokens
+class Token(BaseModel):
+    access_token: str
+    token_type: str
 
+class TokenData(BaseModel):
+    username: str | None = None

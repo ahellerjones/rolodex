@@ -1,3 +1,4 @@
+from fastapi import Depends, FastAPI, HTTPException, status
 from sqlalchemy.orm import Session
 import os, sys
 file_dir = os.path.dirname(__file__)
@@ -32,18 +33,63 @@ def read_user_by_username(db: Session, username: str):
 def read_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.User).offset(skip).limit(limit).all()
 
-def create_contact(db: Session, contact: schemas.ContactCreate, user_id: int): 
+def create_contact(db: Session, contact: schemas.ContactCreate, user_id: str): 
     db_contact_obj = models.Contact(**contact.dict(), owner_id=user_id) # Unfurl the contact into a dict and put it into a Contact model
+    exists = db.query(models.Contact).filter(
+        models.Contact.owner_id == user_id
+        ).filter(
+        models.Contact.name == contact.name
+        ).first()
+    if exists is not None:
+        raise HTTPException(status_code=409, detail="Contact with this ID already exists")
     db.add(db_contact_obj)
     db.commit()
     db.refresh(db_contact_obj)
     return db_contact_obj
 
-def read_contacts_for_user(db: Session, user_id: int): 
+def update_contact(db: Session, contact_id: int, contact: schemas.ContactUpdate, user_id: str): 
+    db_contact = db.query(models.Contact).filter(
+        models.Contact.owner_id == user_id
+        ).filter(
+        models.Contact.id == contact_id
+        ).first()
+    if db_contact is None:
+        raise HTTPException(status_code=404, detail="Contact not found")
+    contact_data = contact.dict(exclude_unset=True)
+    if contact_data.get("name") is not None: 
+        # If we're trying to change the name we need to ensure that the name we're
+        # going to isn't already in the db.
+        does_this_contact_name_exist = db.query(models.Contact).filter(
+            models.Contact.owner_id == user_id
+            ).filter(
+            models.Contact.name == contact_data.get("name")
+            ).first()
+        # However if someone provides an update with the SAME name to the existing
+        # we should not throw an error
+        if does_this_contact_name_exist: 
+            if does_this_contact_name_exist.id != contact_id:
+                raise HTTPException(status_code=409, detail="Contact with this name already exists")
+
+    for key, value in contact_data.items():
+        setattr(db_contact, key, value)
+    db.add(db_contact)
+    db.commit()
+    db.refresh(db_contact)
+    return db_contact
+
+def read_contacts_for_user(db: Session, user_id: str): 
     # I think this is how we do this. 
     return db.query(models.Contact).filter(models.Contact.owner_id == user_id)
 
-def read_contact_for_user_id(db: Session, user_id: int, contact_id: int): 
-    return db.query(models.Contact).filter(models.Contact.id == contact_id, models.Contact.owner_id == user_id) # I have no idea what im doing 
-
-# def update_contact_for_user_id(db: Session, user_id: int, contact_id: int): 
+# Delete contact from database
+def delete_contact(db: Session, user_id: str, contact_id: int):
+    contact = db.query(models.Contact).filter(
+        models.Contact.owner_id == user_id
+    ).filter(
+        models.Contact.id == contact_id).first()
+    if contact:
+        db.delete(contact)
+        db.commit()
+        return contact
+    else:
+        raise HTTPException(status_code=404, detail="Contact not found")

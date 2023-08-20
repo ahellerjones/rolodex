@@ -22,13 +22,16 @@ class User(Base):
 
 class Contact (Base): 
     __tablename__ = "contacts"
+    # While both id and name are enforced to be unique, we include id
+    # so that it can easily be referenced within urls and contain the 
+    # same body request as the Create.
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String,index=True) # What does index do?
     address = Column(String,index=True)
     phoneNumber = Column(String,index=True)
     email = Column(String,index=True)
     birthday = Column(String,index=True)
-    owner_id = Column(Integer,ForeignKey('users.id') )
+    owner_id = Column(String,ForeignKey('users.username') )
     owner = relationship('User', back_populates='contacts')
 
 
