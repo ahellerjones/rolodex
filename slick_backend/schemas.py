@@ -37,7 +37,9 @@ class Contact(ContactBase):
 
 # For an update
 class ContactUpdate(ContactBase):
-    pass
+    # We now make the name field optional as you don't need to actually supply it. 
+    # Our URL will always contain the contact_id so we're covered there
+    name: Optional[str] = None 
 
 # When we want to delete 
 class ContactDelete(ContactBase): 
